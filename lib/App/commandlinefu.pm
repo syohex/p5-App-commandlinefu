@@ -8,6 +8,18 @@ use Furl;
 our $VERSION = '0.01';
 
 with 'MouseX::Getopt';
+
+has 'n|no-color' => (
+    is => 'ro',
+    isa => 'Bool',
+    default => 1,
+);
+
+has '_query' => (
+    accessor => 'query',
+    isa => 'Str',
+);
+
 has '_ua' => (
     accessor => 'ua',
     isa => 'Furl',
@@ -19,6 +31,20 @@ sub _build__ua {
         agent => __PACKAGE__ . $VERSION,
         timeout => 10,
     );
+}
+
+has '_print_command' => (
+    is => 'rw',
+    isa => 'CodeRef',
+);
+
+sub BUILD {
+    my $self = shift;
+
+    my $print_func = defined $self->n
+        ? &_print_command_nocolor : &_print_command_color;
+
+    $self->_print_command( $print_func );
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -46,15 +72,32 @@ sub run {
 
     my $command_infos_ref = $self->_parse_response(\$content);
     for my $command_info (@{$command_infos_ref}) {
-        print BRIGHT_BLUE "# ";
-        print encode_utf8($command_info->{summary});
-        print encode_utf8(" [votes=" . encode_utf8($command_info->{votes}) . "]\n");
-        print RESET;
-
-        my $colored_query = YELLOW . $query . RESET;
-        $command_info->{command} =~ s/$query/$colored_query/g;
-        print encode_utf8($command_info->{command}), "\n\n";
+        $self->_print_command($command_info);
     }
+}
+
+sub _print_command_color {
+    my ($self, $command_info) = @_;
+
+    print BRIGHT_BLUE "# ";
+    print encode_utf8($command_info->{summary});
+    print encode_utf8(" [votes=" . encode_utf8($command_info->{votes}) . "]\n");
+    print RESET;
+
+    my $colored_query = YELLOW . $self->query . RESET;
+    $command_info->{command} =~ s/$self->query/$colored_query/g;
+    print encode_utf8($command_info->{command}), "\n\n";
+}
+
+sub _print_command_nocolor {
+    my ($self, $command_info) = @_;
+
+    my $str = "# " . $command_info->{summary};
+    $str .= " [votes=" . encode_utf8($command_info->{votes}) . "]\n";
+    $str .= "# " . $command_info->{summary};
+    $str .= $command_info->{command} . "\n\n";
+
+    print encode_utf8($str);
 }
 
 sub _validate {
