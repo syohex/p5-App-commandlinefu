@@ -45,18 +45,12 @@ sub _build__ua {
     );
 }
 
-has '_print_command' => (
-    is => 'rw',
-    isa => 'CodeRef',
-);
-
 sub BUILD {
     my $self = shift;
 
-    my $print_func = defined $self->n
-        ? &_print_command_nocolor : &_print_command_color;
-
-    $self->_print_command( $print_func );
+    no strict 'refs';
+    *{__PACKAGE__ . '::_print_command'} = defined $self->no_color
+        ? \&_print_command_nocolor : \&_print_command_color;
 }
 
 __PACKAGE__->meta->make_immutable;
