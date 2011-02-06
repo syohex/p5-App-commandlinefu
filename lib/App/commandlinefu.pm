@@ -9,10 +9,22 @@ our $VERSION = '0.01';
 
 with 'MouseX::Getopt';
 
-has 'n|no-color' => (
-    is => 'ro',
+has 'no-color' => (
+    traits  => [ 'Getopt' ],
+    reader => 'no_color',
     isa => 'Bool',
-    default => 1,
+    cmd_aliases => 'n',
+    default => undef,
+    required => 0,
+);
+
+has 'page' => (
+    traits => [ 'Getopt' ],
+    is => 'ro',
+    isa => 'Int',
+    cmd_aliases => 'p',
+    default => 0,
+    required => 0,
 );
 
 has '_query' => (
