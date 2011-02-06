@@ -132,7 +132,7 @@ __END__
 
 =head1 NAME
 
-App::commandlinefu -
+App::commandlinefu - Client of commandlinefu in Perl Language
 
 =head1 SYNOPSIS
 
@@ -156,5 +156,7 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =head1 SEE ALSO
+
+Originl command: L<http://d.hatena.ne.jp/t9md/20101112/1289573697>
 
 =cut
