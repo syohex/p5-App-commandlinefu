@@ -59,11 +59,16 @@ use Term::ANSIColor qw(:constants);
 
 sub run {
     my ($self, $query) = @_;
+    my $command_set;
 
-    _validate($query);
-    $self->query($query);
+    if (defined $query) {
+        $self->query($query);
+        $command_set = 'matching';
+    } else {
+        $command_set = 'browse';
+    }
 
-    my $url = $self->_api_url($query);
+    my $url = $self->_api_url($command_set);
 
     my $res = $self->ua->get($url);
     unless ($res->is_success) {
@@ -102,25 +107,24 @@ sub _print_command_nocolor {
     print encode_utf8($str);
 }
 
-sub _validate {
-    my $query = shift;
-
-    unless (defined $query) {
-        Carp::croak("Usage $0 search_command\n");
-    }
-}
-
 sub _parse_response {
     my ($self, $content_ref) = @_;
     return decode_json(${$content_ref});
 }
 
 sub _api_url {
-    my ($self, $query) = @_;
-    my $base = 'http://www.commandlinefu.com/commands/matching';
-    my $base64 = encode_base64($query, '');
+    my ($self, $command_set) = @_;
+    my $format = 'json';
 
-    return "${base}/${query}/${base64}/json";
+    my $url = 'http://www.commandlinefu.com/commands';
+    if ($command_set eq 'browse') {
+        $url .= "browse/sort-by-votes";
+    } else {
+        $url .= 'matching/' . $self->query;
+        $url .= encode_base64($self->query, '')
+    }
+
+    return "$url/$format";
 }
 
 1;
