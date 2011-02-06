@@ -59,7 +59,9 @@ use Term::ANSIColor qw(:constants);
 
 sub run {
     my ($self, $query) = @_;
+
     _validate($query);
+    $self->query($query);
 
     my $url = $self->_api_url($query);
 
