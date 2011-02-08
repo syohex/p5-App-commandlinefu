@@ -60,6 +60,7 @@ no Mouse;
 use Carp;
 use Encode;
 use JSON::XS;
+use URI::Escape;
 use MIME::Base64;
 use Term::ANSIColor qw(:constants);
 
@@ -97,8 +98,11 @@ sub _print_command_color {
     print encode_utf8(" [votes=" . encode_utf8($command_info->{votes}) . "]\n");
     print RESET;
 
-    my $colored_query = YELLOW . $self->query . RESET;
-    $command_info->{command} =~ s/$self->query/$colored_query/g;
+    if (defined $self->query) {
+        my $query = $self->query;
+        my $colored_query = YELLOW . $query . RESET;
+        $command_info->{command} =~ s/$query/$colored_query/g;
+    }
     print encode_utf8($command_info->{command}), "\n\n";
 }
 
@@ -107,7 +111,6 @@ sub _print_command_nocolor {
 
     my $str = "# " . $command_info->{summary};
     $str .= " [votes=" . encode_utf8($command_info->{votes}) . "]\n";
-    $str .= "# " . $command_info->{summary};
     $str .= $command_info->{command} . "\n\n";
 
     print encode_utf8($str);
@@ -122,15 +125,19 @@ sub _api_url {
     my ($self, $command_set) = @_;
     my $format = 'json';
 
-    my $url = 'http://www.commandlinefu.com/commands';
+    my $base = 'http://www.commandlinefu.com/commands';
+    my $path;
     if ($command_set eq 'browse') {
-        $url .= "browse/sort-by-votes";
+        $path = "browse/sort-by-votes";
     } else {
-        $url .= 'matching/' . $self->query;
-        $url .= encode_base64($self->query, '')
+        $path = 'matching/' . uri_escape($self->query);
+        $path .= '/' . uri_escape( encode_base64($self->query, '') );
     }
 
-    return "$url/$format";
+    $path .= "/$format/" . $self->page;
+
+    my $url = "${base}/$path";
+    return $url;
 }
 
 1;
