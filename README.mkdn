@@ -1,0 +1,28 @@
+# NAME
+
+App::commandlinefu - Client of commandlinefu in Perl Language
+
+# SYNOPSIS
+
+  use App::commandlinefu;
+
+# DESCRIPTION
+
+App::commandlinefu is
+
+# AUTHOR
+
+Syohei YOSHIDA <syohex@gmail.com>
+
+# COPYRIGHT
+
+Copyright 2011- Syohei YOSHIDA
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+# SEE ALSO
+
+Originl command: [http://d.hatena.ne.jp/t9md/20101112/1289573697](http://d.hatena.ne.jp/t9md/20101112/1289573697)
